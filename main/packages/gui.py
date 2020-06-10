@@ -25,25 +25,24 @@ def startGUI():
     canvas = ResizingCanvas(root, width=1280, height=720)
     canvas.pack(fill="both", expand=True)
 
-    initMainFrame()
     initLoginFrame()
+    initMainFrame()
 
     # Keeps the GUI running
     root.mainloop()
 
 
 def initMainFrame():
-    mainFrame = tk.Frame(root, bg="blue")
+    mainFrame = tk.Frame(root)
     mainFrame.place(relx=0.1, rely=0.1, relheight=0.8, relwidth=0.8)
 
-    button = tk.Button(mainFrame, text="Login")
-    button.pack()
+    buttonSignin = tk.Button(mainFrame, text="Sign in")
+    buttonSignin.pack()
 
-    label = tk.Label(mainFrame, text="Click a button to get started", bg="yellow", font={"arial", 16})
-    label.pack()
+    buttonSignup = tk.Button(mainFrame, text="Sign up")
+    buttonSignup.pack()
 
-    entry = tk.Entry(mainFrame, bg="green")
-    entry.pack()
+    mainFrame.tkraise()
 
 
 def initLoginFrame():
@@ -58,5 +57,3 @@ def initLoginFrame():
 
     entry = tk.Entry(signinFrame, bg="green")
     entry.pack()
-
-    signinFrame.tkraise()
