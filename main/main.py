@@ -1,5 +1,5 @@
 # Import dependencies
-from packages.gui import *
+from packages.designer import *
 
 if __name__ == '__main__':
     startGUI()
