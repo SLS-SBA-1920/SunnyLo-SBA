@@ -1,7 +1,7 @@
 # Import all dependencies
 import tkinter as tk
 
-from resizeCanvas import ResizingCanvas
+from .resizingCanvas import ResizingCanvas
 
 # All of the frame init
 root = None

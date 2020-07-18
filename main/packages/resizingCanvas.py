@@ -17,8 +17,11 @@ class ResizingCanvas(Canvas):
         self.background.bind('<Configure>', self._resize_image)
 
     def _resize_image(self, event):
-        new_width = event.width - 4
-        new_height = event.height - 4
+
+        if self.changeSize is None:
+            self.changeSize = event.height - 720
+        new_width = event.width - self.changeSize
+        new_height = event.height - self.changeSize
 
         self.image = self.img_copy.resize((new_width, new_height))
 
