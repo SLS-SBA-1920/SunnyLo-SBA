@@ -17,8 +17,7 @@ class ResizingCanvas(Canvas):
         self.background.bind('<Configure>', self._resize_image)
 
     def _resize_image(self, event):
-
-        if self.changeSize is None:
+        if not hasattr(self, 'changeSize'):
             self.changeSize = event.height - 720
         new_width = event.width - self.changeSize
         new_height = event.height - self.changeSize
