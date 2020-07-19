@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cd "$(dirname "$0")"
 python3 main/main.py
-echo "Press Enter to continue..."
+printf "Press Enter to continue..."
 read
