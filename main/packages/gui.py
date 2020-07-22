@@ -18,11 +18,6 @@ def startGUI():
     root = tk.Tk()
     root.title("St. Louis School ICT SBA by SunnyLo")
 
-    # Make the window content area transparent
-    # root.wm_attributes("-transparent", True)
-    # Set the root window background color to a transparent color
-    # root.config(bg='systemTransparent')
-
     # Create the window in the centre of the screen
     positionRight = int(root.winfo_screenwidth() / 2 - 1280 / 2)
     positionDown = int(root.winfo_screenheight() / 2 - 720 / 2)
