@@ -1,4 +1,5 @@
 import tkinter as tk
+import sys
 
 fullScreen = False
 
@@ -6,7 +7,7 @@ fullScreen = False
 def initWindowMenu(root, menuBar):
     windowMenu = tk.Menu(menuBar, tearoff=0)
     windowMenu.add_command(label="Full Screen", command=lambda: fullScreenToggle(root, windowMenu), accelerator="F11")
-    windowMenu.add_command(label="Maximise", command=lambda: root.state('zoomed'))
+    windowMenu.add_command(label="Maximise", command=lambda: maximise(root))
     windowMenu.add_command(label="Minimise", command=lambda: root.iconify())
     windowMenu.add_separator()
     windowMenu.add_command(label="Exit", command=root.quit)
@@ -36,3 +37,10 @@ def enableFullScreen(root, windowMenu):
     fullScreen = True
     root.attributes('-fullscreen', True)
     windowMenu.entryconfig(0, label="Exit Full Screen")
+
+
+def maximise(root):
+    if sys.platform == 'win32' or sys.platform == 'darwin':
+        root.state('zoomed')
+    else:
+        root.attributes('-zoomed', True)
