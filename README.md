@@ -15,3 +15,11 @@ This application has been tested in MacOS, Windows and Linux (PopOS/Ubuntu distr
 Windows  | / | / 
 MacOS  | Please make sure you have install the latest version of Python (3.8.4, 3.7.8, 2.7.18), which includes Tcl/Tk (8.6.8) which is required for this application<br /><br />"pyobjc" is required. Please install the dependency with "pip install pyobjc" | The buttons may not be clickable when you launch the code. Please unfocus the app and refocus to fix the issue
 Linux  | / | /
+
+<br /><br /><br />
+
+. | Dock App Name | Dock App Icon | App Icon | App Name | Menu Bar Name
+--- | --- | --- | --- | --- | ---
+Windows  | ✅ | Cannot be change | ✅| ✅ | Not applicable
+MacOS  | Cannot be rename | ✅ | Not applicable | ✅ | ✅
+Linux  | Cannot be rename | ✅ | Not applicable | ✅ | Cannot be rename
