@@ -8,13 +8,14 @@ root = None
 initFrame = None
 mainFrame = None
 signinFrame = None
-signupFrame = None
-loginedFrame = None
+createUserFrame = None
+appFrame = None
 adminControlFrame = None
+focusedFrame = None
 
 
 def startGUI(*args, **kwargs):
-    global root, mainFrame, signinFrame, signupFrame, initFrame
+    global root, mainFrame, signinFrame, createUserFrame, initFrame, appFrame, adminControlFrame
     root = tk.Tk()
     root.title("St. Louis School ICT SBA by SunnyLo")
 
@@ -43,17 +44,25 @@ def startGUI(*args, **kwargs):
     initMenu(root)
 
     # Init all frames
+    from .guis.appFrame import initAppFrame
+    appFrame = initAppFrame(root)
+    from .guis.adminFrame import initAdminFrame
+    adminControlFrame = initAdminFrame(root)
+    from .guis.editUserFrame import initEditUserFrame
+    initEditUserFrame(root)
     from .guis.signinFrame import initLoginFrame
     signinFrame = initLoginFrame(root)
-    from .guis.signupFrame import initSignupFrame
-    signupFrame = initSignupFrame(root)
+    from .guis.createUserFrame import initCreateUserFrame
+    createUserFrame = initCreateUserFrame(root)
     from .guis.mainFrame import initMainFrame
-    mainFrame = initMainFrame(root, signinFrame, signupFrame)
+    mainFrame = initMainFrame(root, signinFrame)
 
     # Check if it is first init
     if len(args) == 1:
         from .guis.initFrame import initInitFrame
         initFrame = initInitFrame(root)
+        from .menus import accountMenu
+        accountMenu.setMenuStatus("Login", "disabled")
 
     # Keeps the GUI running
     root.mainloop()
@@ -67,5 +76,13 @@ def getSigninFrame():
     return signinFrame
 
 
-def getSignupFrame():
-    return signupFrame
+def getCreateUserFrame():
+    return createUserFrame
+
+
+def getAppFrame():
+    return appFrame
+
+
+def getAdminFrame():
+    return adminControlFrame

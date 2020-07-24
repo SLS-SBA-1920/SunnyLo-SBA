@@ -10,7 +10,7 @@ def setValue(yaml):
 
 
 def getContent(key):
-    return yamlContent[key]
+    return yamlContent.get(key)
 
 
 def setContent(key, value):

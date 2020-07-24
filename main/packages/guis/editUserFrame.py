@@ -2,56 +2,58 @@ import tkinter as tk
 import bcrypt
 import base64
 import hashlib
-from packages.gui import getMainFrame, getAppFrame
+from packages.gui import getAdminFrame
 from data import storage
-from packages.menus import accountMenu
+from data import config
 
 changingColor = False
 
+index = None
+editUserFrame = None
+username = None
+admin = None
 
-def initLoginFrame(root):
-    signinFrame = tk.Frame(root)
-    signinFrame.place(relx=0.1, rely=0.1, relheight=0.8, relwidth=0.8)
+
+def initEditUserFrame(root):
+    global editUserFrame, username, admin, index
+    editUserFrame = tk.Frame(root)
+    editUserFrame.place(relx=0.1, rely=0.1, relheight=0.8, relwidth=0.8)
 
     backImg = tk.PhotoImage(file="../sources/buttons/back-button.png")
-    backBtn = tk.Button(signinFrame, height=64, width=64, image=backImg, padx=0, pady=0, borderwidth=0,
+    backBtn = tk.Button(editUserFrame, height=64, width=64, image=backImg, padx=0, pady=0, borderwidth=0,
                         highlightthickness=0, bd=0,
-                        relief="flat", command=lambda: liftFrame(getMainFrame()))
+                        relief="flat", command=lambda: getAdminFrame().tkraise())
     backBtn["image"] = backImg
     backBtn.image = backImg
     backBtn.place(relx=0.0, rely=0.0, anchor="nw")
 
     # Centres all the elements in the frame
-    subFrame = tk.Frame(signinFrame)
+    subFrame = tk.Frame(editUserFrame)
     subFrame.place(relx=0.5, rely=0.5, anchor="center")
 
     def login(*args, **kwargs):
-        labelError.config(text="Loggining...")
         if username.get() == "":
             labelError.config(text="Please fill in your username")
             usernameEntry.focus()
             changeColor(usernameEntry, 0, 5)
             return False
+        passwd = None
         if password.get() == "":
-            labelError.config(text="Please fill in your password")
-            passwordEntry.focus()
-            changeColor(passwordEntry, 0, 5)
-            return False
-
-        users = storage.getContent("users")
-        for userData in users:
-            if userData["username"] == username.get():
-                passwd = base64.b64encode(hashlib.sha256(password.get().encode('utf-8')).digest())
-                if bcrypt.checkpw(passwd, userData["password"].encode('utf-8')):
-                    accountMenu.setMenuStatus("Login", "disabled")
-                    accountMenu.setMenuStatus("Logout", "normal")
-                    if userData["admin"]:
-                        accountMenu.setMenuStatus("Open Admin Menu", "normal")
-                    getAppFrame().tkraise()
-                    return True
-                else:
-                    break
-        labelError.config(text="Invalid username and password")
+            passwd = storage.getContent("users")[index].get("password")
+        else:
+            passwd = bcrypt.hashpw(base64.b64encode(hashlib.sha256(password.get().encode('utf-8')).digest()),
+                                   bcrypt.gensalt(rounds=config.getContent("PasswordEncryptionSecurityLevel"))).decode(
+                "utf-8")
+        storage.getContent("users")[index] = {"username": username.get(), "password": passwd,
+                                              "admin": admin.get() == 1}
+        storage.save()
+        username.set("")
+        password.set("")
+        admin.set(0)
+        labelError.config(text="")
+        from packages.guis.adminFrame import loadUsers
+        loadUsers()
+        getAdminFrame().tkraise()
 
     def _from_rgb(rgb):
         return "#%02x%02x%02x" % rgb
@@ -66,11 +68,7 @@ def initLoginFrame(root):
             entry.config(background=_from_rgb((255, color + change, color + change)))
             root.after(4, lambda: changeColor(entry, color + change, change))
 
-    def removeError(*args):
-        labelError.config(text="")
-
-    signinLabel = tk.Label(subFrame, text="Login", font=("", 50, "bold"))
-    signinLabel.pack()
+    tk.Label(subFrame, text="Edit User", font=("", 50, "bold")).pack()
 
     username = tk.StringVar()
     usernameLabel = tk.Label(subFrame, text="Username:")
@@ -79,29 +77,34 @@ def initLoginFrame(root):
     usernameEntry.pack()
     usernameEntry.bind("<Tab>", lambda e: passwordEntry.focus())
     usernameEntry.bind('<Return>', login)
-    username.trace_add("write", removeError)
 
     def nextFocus(e):
         usernameEntry.focus()
         return ("break")
 
     password = tk.StringVar()
-    passwordLabel = tk.Label(subFrame, text="Password:")
+    passwordLabel = tk.Label(subFrame, text="Password (Leave blank to keep\nthis user's password the same):")
     passwordLabel.pack(pady=(50, 10))
     passwordEntry = tk.Entry(subFrame, show="*", textvariable=password)
     passwordEntry.pack()
     passwordEntry.bind("<Tab>", nextFocus)
     passwordEntry.bind('<Return>', login)
-    password.trace_add("write", removeError)
 
-    loginBtn = tk.Button(subFrame, text="Login", command=login)
+    admin = tk.IntVar()
+    adminCheckBtn = tk.Checkbutton(subFrame, text="Administrator", variable=admin, onvalue=1, offvalue=0)
+    adminCheckBtn.pack()
+
+    loginBtn = tk.Button(subFrame, text="Edit", command=login)
     loginBtn.pack(pady=(50, 0))
 
     labelError = tk.Label(subFrame, text="")
     labelError.pack()
 
-    return signinFrame
 
-
-def liftFrame(frame):
-    frame.tkraise()
+def editUser(i):
+    global username, admin, index
+    user = storage.getContent("users")[i]
+    username.set(user.get("username"))
+    admin.set(1 if user.get("admin") else 0)
+    editUserFrame.tkraise()
+    index = i

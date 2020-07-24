@@ -4,12 +4,14 @@ import base64
 import hashlib
 from packages.gui import getMainFrame
 from data import storage
+from data import config
+from packages.menus import accountMenu
 
 changingColor = False
 
 
 def initInitFrame(root):
-    initFrame = tk.Frame(root, bg="blue")
+    initFrame = tk.Frame(root)
     initFrame.place(relx=0.1, rely=0.1, relheight=0.8, relwidth=0.8)
 
     # Centres all the elements in the frame
@@ -29,8 +31,14 @@ def initInitFrame(root):
             changeColor(passwordEntry, 0, 5)
             return False
 
+        if not storage.getContent("users") == None:
+            for users in storage.getContent("users"):
+                if users["username"] == username.get():
+                    labelError.config(text="The user exists, please try another")
+                    return False
+
         passwd = bcrypt.hashpw(base64.b64encode(hashlib.sha256(password.get().encode('utf-8')).digest()),
-                               bcrypt.gensalt())
+                               bcrypt.gensalt(rounds=config.getContent("PasswordEncryptionSecurityLevel")))
         storage.addContent("users", {"username": username.get(), "password": passwd.decode("utf-8"), "admin": True})
         root.focus()
         password.set("")
@@ -42,7 +50,12 @@ def initInitFrame(root):
         root.after(2000, lambda: labelError.config(text=labelError.cget("text") + "."))
         root.after(3000, lambda: labelError.config(text=labelError.cget("text") + "."))
         root.after(4000, lambda: labelError.config(text=labelError.cget("text") + "."))
-        root.after(5000, lambda: getMainFrame().tkraise())
+
+        def backToMainApp():
+            accountMenu.setMenuStatus("Login", "normal")
+            getMainFrame().tkraise()
+
+        root.after(5000, backToMainApp)
 
     def _from_rgb(rgb):
         return "#%02x%02x%02x" % rgb
@@ -57,7 +70,7 @@ def initInitFrame(root):
             entry.config(background=_from_rgb((255, color + change, color + change)))
             root.after(4, lambda: changeColor(entry, color + change, change))
 
-    signinLabel = tk.Label(subFrame, text="To start, please setup an administrative user", font=("", 50, "bold"))
+    signinLabel = tk.Label(subFrame, text="To start, please setup an\n administrative user", font=("", 35, "bold"))
     signinLabel.pack()
 
     username = tk.StringVar()

@@ -1,17 +1,23 @@
 import tkinter as tk
-from packages.gui import getMainFrame
+import bcrypt
+import base64
+import hashlib
+from packages.gui import getAdminFrame
+from packages.guis.adminFrame import loadUsers
+from data import storage
+from data import config
 
 changingColor = False
 
 
-def initSignupFrame(root):
-    signupFrame = tk.Frame(root, bg="blue")
+def initCreateUserFrame(root):
+    signupFrame = tk.Frame(root)
     signupFrame.place(relx=0.1, rely=0.1, relheight=0.8, relwidth=0.8)
 
     backImg = tk.PhotoImage(file="../sources/buttons/back-button.png")
     backBtn = tk.Button(signupFrame, height=64, width=64, image=backImg, padx=0, pady=0, borderwidth=0,
                         highlightthickness=0, bd=0,
-                        relief="flat", command=lambda: liftFrame(getMainFrame()))
+                        relief="flat", command=lambda: getAdminFrame().tkraise())
     backBtn["image"] = backImg
     backBtn.image = backImg
     backBtn.place(relx=0.0, rely=0.0, anchor="nw")
@@ -33,6 +39,22 @@ def initSignupFrame(root):
             changeColor(passwordEntry, 0, 5)
             return False
 
+        for users in storage.getContent("users"):
+            if users["username"] == username.get():
+                labelError.config(text="The user exists, please try another")
+                return False
+
+        passwd = bcrypt.hashpw(base64.b64encode(hashlib.sha256(password.get().encode('utf-8')).digest()),
+                               bcrypt.gensalt(rounds=config.getContent("PasswordEncryptionSecurityLevel")))
+        storage.addContent("users",
+                           {"username": username.get(), "password": passwd.decode("utf-8"), "admin": admin.get() == 1})
+        username.set("")
+        password.set("")
+        admin.set(0)
+        labelError.config(text="")
+        loadUsers()
+        getAdminFrame().tkraise()
+
     def _from_rgb(rgb):
         return "#%02x%02x%02x" % rgb
 
@@ -46,7 +68,7 @@ def initSignupFrame(root):
             entry.config(background=_from_rgb((255, color + change, color + change)))
             root.after(4, lambda: changeColor(entry, color + change, change))
 
-    signinLabel = tk.Label(subFrame, text="Signup", font=("", 50, "bold"))
+    signinLabel = tk.Label(subFrame, text="Create User", font=("", 50, "bold"))
     signinLabel.pack()
 
     username = tk.StringVar()
@@ -69,14 +91,14 @@ def initSignupFrame(root):
     passwordEntry.bind("<Tab>", nextFocus)
     passwordEntry.bind('<Return>', login)
 
-    loginBtn = tk.Button(subFrame, text="Login", command=login)
+    admin = tk.IntVar()
+    adminCheckBtn = tk.Checkbutton(subFrame, text="Administrator", variable=admin, onvalue=1, offvalue=0)
+    adminCheckBtn.pack()
+
+    loginBtn = tk.Button(subFrame, text="Create", command=login)
     loginBtn.pack(pady=(50, 0))
 
     labelError = tk.Label(subFrame, text="")
     labelError.pack()
 
     return signupFrame
-
-
-def liftFrame(frame):
-    frame.tkraise()

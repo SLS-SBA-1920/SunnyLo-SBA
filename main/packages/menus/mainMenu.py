@@ -7,6 +7,9 @@ def initMenu(root):
     global menuBar
     menuBar = tk.Menu(root)
 
+    from packages.menus.accountMenu import initAccountMenu
+    initAccountMenu(menuBar)
+
     from packages.menus.windowMenu import initWindowMenu
     initWindowMenu(root, menuBar)
 

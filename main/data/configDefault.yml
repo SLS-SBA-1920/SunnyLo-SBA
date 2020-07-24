@@ -1,3 +1,6 @@
 # Configuration file for the SBA Application
 # Author: SunnyLo
-# There is currently no configuration available
+
+# The default level for encryption is 12
+# Increasing the level will increase the security while also increasing the wait time when encrypting the password
+PasswordEncryptionSecurityLevel: 12
